@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8086 Memory Architect</title>
+    <!-- Modern, clean typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Clean, subtle background blobs for glass effect -->
+    <div class="glow-bg">
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="glow glow-3"></div>
+    </div>
+
+    <!-- Light minimal grid overlay -->
+    <div class="grid-overlay"></div>
+
+    <main class="container">
+        <header class="fade-in" style="animation-delay: 0.1s;">
+            <div class="brand">
+                <div class="logo-box">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="logo-icon">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                        <line x1="12" y1="8" x2="12" y2="16"></line>
+                    </svg>
+                </div>
+                <div class="text">
+                    <h1>MEMORY ARCHITECT</h1>
+                    <p>8086 Effective & Physical Address Engine</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="app-layout">
+            <!-- Left Panel: Controls -->
+            <section class="control-center glass-panel fade-in" style="animation-delay: 0.2s;">
+                <div class="panel-header">
+                    <h2>Configuration</h2>
+                    <div class="status-dot"></div>
+                </div>
+
+                <form id="calculator-form">
+                    <!-- Mode Selection -->
+                    <div class="input-group slide-up">
+                        <label for="addressing-mode">Architecture Mode</label>
+                        <div class="neo-select">
+                            <select id="addressing-mode" name="addressing-mode">
+                                <option value="direct">Direct</option>
+                                <option value="indirect">Indirect</option>
+                                <option value="register-direct">Register Direct</option>
+                                <option value="register-indirect">Register Indirect</option>
+                                <option value="immediate">Immediate</option>
+                                <option value="displacement">Displacement</option>
+                                <option value="stack">Stack</option>
+                            </select>
+                            <div class="select-icon">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cyber-divider text-divider">REGISTERS [HEX]</div>
+
+                    <div class="registers-layout">
+                        <!-- Segment -->
+                        <div class="reg-box slide-up" style="animation-delay: 0.1s;" id="segment-group">
+                            <label>Segment</label>
+                            <div class="hex-field">
+                                <select id="segment-reg" class="mini-select">
+                                    <option value="DS">DS</option>
+                                    <option value="CS">CS</option>
+                                    <option value="SS">SS</option>
+                                    <option value="ES">ES</option>
+                                </select>
+                                <div class="val-input">
+                                    <span>0x</span>
+                                    <input type="text" id="segment-val" placeholder="0000" maxlength="4" autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- General Purpose Register (Register Direct) -->
+                        <div class="reg-box slide-up" style="animation-delay: 0.2s; display: none;" id="gen-reg-group">
+                            <label>General Register (No EA)</label>
+                            <div class="hex-field">
+                                <select id="gen-reg" class="mini-select" style="width: 100%; border-right: none;">
+                                    <option value="AX">AX</option>
+                                    <option value="BX">BX</option>
+                                    <option value="CX">CX</option>
+                                    <option value="DX">DX</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Pointer Register (Register Indirect / Displacement) -->
+                        <div class="reg-box slide-up" style="animation-delay: 0.25s; display: none;" id="ptr-reg-group">
+                            <label>Pointer Reg</label>
+                            <div class="hex-field">
+                                <select id="ptr-reg" class="mini-select">
+                                    <option value="BX">BX</option>
+                                    <option value="BP">BP</option>
+                                    <option value="SI">SI</option>
+                                    <option value="DI">DI</option>
+                                </select>
+                                <div class="val-input">
+                                    <span>0x</span>
+                                    <input type="text" id="ptr-val" placeholder="0000" maxlength="4" autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stack Pointer -->
+                        <div class="reg-box slide-up" style="animation-delay: 0.3s; display: none;" id="sp-group">
+                            <label>Stack Pointer (SP)</label>
+                            <div class="hex-field">
+                                <div class="locked-label">SP</div>
+                                <div class="val-input">
+                                    <span>0x</span>
+                                    <input type="text" id="sp-val" placeholder="0000" maxlength="4" autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Immediate Data -->
+                        <div class="reg-box slide-up flex-span" style="animation-delay: 0.35s; display: none;" id="data-group">
+                            <label>Immediate Data (16-bit)</label>
+                            <div class="hex-field">
+                                <div class="locked-label">DATA</div>
+                                <div class="val-input">
+                                    <span>0x</span>
+                                    <input type="text" id="data-val" placeholder="0000" maxlength="4" autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Displacement / Address -->
+                        <div class="reg-box slide-up flex-span" style="animation-delay: 0.4s;" id="disp-group">
+                            <label>Address / Displacement</label>
+                            <div class="hex-field">
+                                <div class="locked-label">VAL</div>
+                                <div class="val-input">
+                                    <span>0x</span>
+                                    <input type="text" id="disp-val" placeholder="0000" maxlength="4" autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-dock">
+                        <button type="button" id="calc-btn" class="cyber-btn primary">
+                            <span class="btn-text">Execute Calculation</span>
+                        </button>
+                        <button type="reset" id="reset-btn" class="cyber-btn ghost" title="Reset Registers">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Right Panel: Telemetry / Results -->
+            <section class="telemetry-panel glass-panel hidden" id="results-panel">
+                <div class="panel-header">
+                    <h2>Telemetry</h2>
+                    <div class="mode-badge" id="formula-badge">EA = [BX] + Disp</div>
+                </div>
+
+                <div class="data-stream">
+                    <!-- Segment Shift Block -->
+                    <div class="stream-block">
+                        <div class="block-title">SEGMENT SHIFT (10H)</div>
+                        <div class="math-flow">
+                            <div class="node text-accent" id="res-seg-name">DS</div>
+                            <div class="connector">×</div>
+                            <div class="node">10H</div>
+                            <div class="connector">=</div>
+                            <div class="node highlight"><span class="hex-prefix">0x</span><span id="res-seg-shift">00000</span></div>
+                        </div>
+                    </div>
+
+                    <!-- EA Block -->
+                    <div class="stream-block">
+                        <div class="block-title">EFFECTIVE ADDRESS [16-bit]</div>
+                        <div class="math-flow" id="res-ea-math">
+                            <!-- Injected by JS -->
+                        </div>
+                        <div class="ea-result-box">
+                            <span class="label">EA TOTAL:</span>
+                            <span class="val highlight"><span class="hex-prefix">0x</span><span id="res-ea-val">0000</span></span>
+                        </div>
+                    </div>
+
+                    <!-- Physical Address Core -->
+                    <div class="core-result">
+                        <div class="core-title">PHYSICAL ADDRESS [20-bit]</div>
+                        <div class="core-math">
+                            <span id="res-pa-seg">00000H</span>
+                            <span class="plus-icon">+</span>
+                            <span id="res-pa-ea">0000H</span>
+                        </div>
+                        <div class="core-value-display">
+                            <span class="hex-prefix">0x</span><span class="big-hex" id="res-pa-final">00000</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Empty State -->
+            <section class="telemetry-panel glass-panel empty-state fade-in" id="empty-state" style="animation-delay: 0.3s;">
+                <div class="empty-content">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <path d="M3 15h6"></path>
+                        <path d="M3 18h6"></path>
+                    </svg>
+                    <h3>Awaiting Parameters</h3>
+                    <p>Enter hex values and execute to generate memory mapping.</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
